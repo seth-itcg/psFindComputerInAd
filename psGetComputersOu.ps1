@@ -35,7 +35,7 @@ try {
     $indent = 8
     $parts | ForEach-Object { 
         Write-Host (" " * $indent + $_) -ForegroundColor Gray
-        $indent += 4
+        $indent += 2
     }
 } catch {
     Write-Host "`nError: Could not find computer '$computerName' in the domain '$domain'."
@@ -54,7 +54,7 @@ try {
                 $indent = 8
                 $parts | ForEach-Object { 
                     Write-Host (" " * $indent + $_) -ForegroundColor Gray
-                    $indent += 4
+                    $indent += 2
                 }
             }
         } else {
