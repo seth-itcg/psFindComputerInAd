@@ -27,10 +27,16 @@ try {
     Write-Host "Searching for computer '$computerName' on $domainController..."
     $computer = Get-ADComputer -Identity $computerName -Server $domainController -ErrorAction Stop
     # Output the OU or container of the computer.
-    $location = $computer.DistinguishedName -replace '^CN=[^,]+,', ''
+    $location = $computer.DistinguishedName -replace '^CN=[^,]+,', '' -replace ',DC=[^,]+', ''
+    $parts = $location -split ',' | ForEach-Object { $_ -replace '^(OU|CN)=', '' }
+    [array]::Reverse($parts)
     
     Write-Host "`n  - $($computer.Name)" -ForegroundColor Cyan
-    Write-Host "      $location" -ForegroundColor Gray
+    $indent = 8
+    $parts | ForEach-Object { 
+        Write-Host (" " * $indent + $_) -ForegroundColor Gray
+        $indent += 4
+    }
 } catch {
     Write-Host "`nError: Could not find computer '$computerName' in the domain '$domain'."
     Write-Host "`nSearching for similar computer names..."
@@ -42,8 +48,14 @@ try {
             Write-Host "`nFound similar computers:"
             $similarComputers | ForEach-Object {
                 Write-Host "  - $($_.Name)" -ForegroundColor Cyan
-                $location = $_.DistinguishedName -replace '^CN=[^,]+,', ''
-                Write-Host "      $location" -ForegroundColor Gray
+                $location = $_.DistinguishedName -replace '^CN=[^,]+,', '' -replace ',DC=[^,]+', ''
+                $parts = $location -split ',' | ForEach-Object { $_ -replace '^(OU|CN)=', '' }
+                [array]::Reverse($parts)
+                $indent = 8
+                $parts | ForEach-Object { 
+                    Write-Host (" " * $indent + $_) -ForegroundColor Gray
+                    $indent += 4
+                }
             }
         } else {
             Write-Host "No similar computer names found." -ForegroundColor Yellow
